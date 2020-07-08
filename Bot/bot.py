@@ -32,7 +32,6 @@ def pred_scan(img):
 	global probabilities
 	model = load_model('C:/Users/Administrator/Desktop/AI Doc/pneumonia_pred_new.h5')
 	#The Location for h5 file
-
 	imageee = 'C:/Users/Administrator/Desktop/AI Doc/pic1.jpeg'
 	#location for pic file , it;s rewritten on every request
 	img = cv2.imread(imageee)
@@ -86,12 +85,33 @@ async def shutdown(ctx):
 	await client.logout()
 	return
 
+@client.command(pass_context=True)
+@commands.has_role('admin')
+async def botservers(ctx):
+    await ctx.send("I'm in " + str(len(client.guilds)) + " servers")
+    for guild in client.guilds:
+        await ctx.send(guild.name + ' : ' + str(guild.id))
+    return
+
+@client.command(pass_context=True)
+@commands.has_role('admin')
+async def leave(ctx, id):
+    to_leave = client.get_guild(int(id))
+    await ctx.send('Leaving ' + str(to_leave))
+    try:
+        await to_leave.leave()
+        await ctx.send('Left ' + str(to_leave))
+    except:
+        await ctx.send('Failed leaving ' + str(to_leave))
+    return
+
+
 @client.event
 async def on_ready():
 	print(f'{client.user.name} has connected to Discord!')
 
 
-@client.command(pass_context=True, help = "!c url_to_the_scan")
+@client.command(pass_context=True, help = "!d url_to_the_scan")
 #@commands.has_role('botuser')
 async def d(ctx, args):
 	global pred
@@ -124,8 +144,9 @@ async def d(ctx, args):
 		else:
 			rang = 0x44e32b
 		embedVar = discord.Embed(title= pred, description="PNEUMONIA TEST RESULT : " + pred, color=rang)
-		embedVar.add_field(name="Confidence - ", value=str(int(probabilities*100)), inline=False)
+		embedVar.add_field(name="Confidence - ", value=str(int(probabilities*100)-1) + '%', inline=False)
 		embedVar.add_field(name="Imp-", value='The bot can be inaccurate, even when the confidence is 100% , we would always recommend consulting a doctor !', inline=False)
+		embedVar.add_field(name="Dev - ", value='Firelogger#7717', inline=False)
 		await ctx.send(embed=embedVar)
 
 
